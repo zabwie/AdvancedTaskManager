@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Task Manager</title>
+  <link rel="stylesheet" href="src/css/styles.css">
+  <script src="node_modules/chart.js/dist/chart.umd.js"></script>
+</head>
+<body class="light-mode">
+  <header>
+    <div class="app-title">
+      <h1>Advanced Task Manager</h1>
+    </div>
+    <div class="app-controls">
+      <button id="refresh-btn" title="Refresh Data">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+      </button>
+      <button id="theme-toggle" title="Toggle Dark Mode">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <nav class="navbar">
+    <ul class="nav-tabs">
+      <li>
+        <a href="#dashboard" class="active" data-section="dashboard-section">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#processes" data-section="processes-section">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Processes</span>
+        </a>
+      </li>
+      <li>
+        <a href="#settings" data-section="settings-section">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Settings</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="main-content">
+      <!-- Dashboard Section -->
+      <section id="dashboard-section" class="app-section active">
+        <div class="system-resources">
+          <div class="resource-card" id="cpu-card">
+            <h2>CPU</h2>
+            <div class="resource-value" id="cpu-usage">0%</div>
+            <div class="resource-chart-container">
+              <canvas id="cpu-chart"></canvas>
+            </div>
+          </div>
+          <div class="resource-card" id="memory-card">
+            <h2>Memory</h2>
+            <div class="resource-value" id="memory-usage">0 GB / 0 GB</div>
+            <div class="resource-chart-container">
+              <canvas id="memory-chart"></canvas>
+            </div>
+          </div>
+          <div class="resource-card" id="disk-card">
+            <h2>Disk</h2>
+            <div class="resource-value" id="disk-usage">0 GB / 0 GB</div>
+            <div class="resource-chart-container">
+              <canvas id="disk-chart"></canvas>
+            </div>
+          </div>
+          <div class="resource-card" id="network-card">
+            <h2>Network</h2>
+            <div class="resource-value" id="network-usage">0 KB/s</div>
+            <div class="resource-chart-container">
+              <canvas id="network-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Processes Section - making the table smaller -->
+      <section id="processes-section" class="app-section">
+        <div class="processes-section">
+          <div class="processes-header">
+            <h2>Processes</h2>
+            <div class="processes-controls">
+              <input type="text" id="process-search" placeholder="Search processes...">
+              <select id="process-sort">
+                <option value="name">Name</option>
+                <option value="cpu">CPU (%)</option>
+                <option value="memory">Memory</option>
+                <option value="pid">PID</option>
+              </select>
+            </div>
+          </div>
+          <div class="processes-table-container" style="max-height: 300px;">
+            <table class="processes-table">
+              <thead>
+                <tr>
+                  <th data-sort="name">Name</th>
+                  <th data-sort="pid">PID</th>
+                  <th data-sort="cpu">CPU (%)</th>
+                  <th data-sort="memory">Memory</th>
+                  <th data-sort="disk">Disk I/O</th>
+                  <th data-sort="network">Network</th>
+                  <th>Health</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="process-table-body">
+                <!-- Process rows will be added dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section - add a new Performance Optimizations card -->
+      <section id="settings-section" class="app-section">
+        <div class="settings-section">
+          <!-- Existing settings cards remain unchanged -->
+          
+          <!-- Add new Performance Optimizations card -->
+          <div class="settings-card">
+            <h2>Performance Optimizations</h2>
+            <div class="settings-group">
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Update Frequency</span>
+                  <span class="setting-description">Set update frequency for system stats</span>
+                </div>
+                <input type="number" id="update-frequency" min="500" max="5000" step="100" value="1000">
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Use Worker Threads</span>
+                  <span class="setting-description">Use worker threads for heavy tasks</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="use-worker-threads">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Throttle Events</span>
+                  <span class="setting-description">Throttle or debounce event listeners</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="throttle-events" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Optimize Data Collection</span>
+                  <span class="setting-description">Fetch only necessary system data</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="optimize-data-collection" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Use Animation Frame</span>
+                  <span class="setting-description">Use requestAnimationFrame for UI updates</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="use-animation-frame" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Limit Graph Updates</span>
+                  <span class="setting-description">Limit graph updates to avoid over-redrawing</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="limit-graph-updates" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Pause When Inactive</span>
+                  <span class="setting-description">Pause monitoring when app is minimized</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pause-when-inactive" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Batch UI Updates</span>
+                  <span class="setting-description">Batch UI updates instead of individual DOM changes</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="batch-ui-updates" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Paginate Process Lists</span>
+                  <span class="setting-description">Lazy-load or paginate long process lists</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="paginate-processes">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Minimize IPC</span>
+                  <span class="setting-description">Minimize inter-process communication frequency</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="minimize-ipc" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              
+              <div class="setting-item">
+                <div class="setting-label">
+                  <span class="setting-title">Disable Animations Under Load</span>
+                  <span class="setting-description">Disable animations during high CPU load</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="disable-animations-under-load" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Save settings buttons -->
+          <div class="settings-actions">
+            <button id="save-settings" class="btn btn-primary">Save Settings</button>
+            <button id="close-settings" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Remove this duplicate settings actions div -->
+      <!-- <div class="settings-actions">
+        <button id="save-settings" class="btn btn-primary">Save Settings</button>
+        <button id="close-settings" class="btn btn-secondary">Cancel</button>
+      </div> -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="status-bar">
+      <span id="total-processes">Processes: 0</span>
+      <span id="system-uptime">Uptime: 0:00:00</span>
+    </div>
+  </footer>
+
+  <!-- Add this before the closing body tag -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="src/js/dashboard.js"></script>
+    <script src="src/js/renderer.js"></script>
+    <script src="src/js/charts.js"></script>
+    <script src="src/js/processes.js"></script>
+    <script src="src/js/settings.js"></script>
+    <script src="src/js/navigation.js"></script>
+</body>
+</html>
